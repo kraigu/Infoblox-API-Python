@@ -749,6 +749,33 @@ class Infoblox(object):
         except Exception:
             raise
 
+    def get_all_networks(self, max_results=1000):
+        """ Implements IBA REST API call to retrieve all network objects
+        Returns hash table of networks
+        :param max_results: maximum number of results to return
+            (optional)
+        """
+        rest_url = "https://" + self.iba_host + + '/wapi/v' + \
+            self.iba_wapi_version + '/network&_max_results=' + max_results
+        try:
+            r = requests.get(url=rest_url, auth=(
+                self.iba_user, self.iba_password), verify=self.iba_verify_ssl)
+            r_json = r.json()
+            if r.status_code == 200:
+                if len(r_json) > 0:
+                    return r_json[0]
+                else:
+                    raise InfobloxNotFoundException("No requested network found: " + network)
+            else:
+                if 'text' in r_json:
+                    raise InfobloxNotFoundException(r_json['text'])
+                else:
+                    r.raise_for_status()
+        except ValueError:
+            raise Exception(r)
+        except Exception:
+            raise
+
     def get_network(self, network, fields=None):
         """ Implements IBA REST API call to retrieve network object fields
         Returns hash table of fields with field name as a hash key
