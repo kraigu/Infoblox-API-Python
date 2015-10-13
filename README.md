@@ -10,6 +10,7 @@ Class **Infoblox** implements the following methods:
 - delete_network
 - create_networkcontainer
 - delete_networkcontainer
+- get_all_networks
 - get_next_available_network
 - create_host_record
 - create_txt_record
@@ -54,4 +55,20 @@ try:
 except Exception as e:
     print e
 
+```
+
+```
+import infoblox
+import warnings
+# ignore ssl warnings because who cares about security
+warnings.filterwarnings("ignore", ".*Unverified.*")
+
+iba_api = infoblox.Infoblox('10.10.20.32', 'admin', 'secret', '1.7', 'internal', 'default')
+try:
+	n = iba_api.get_all_networks(max_results='10000') # what's paginating?
+except Exception as e:
+    print e
+
+for net in n:
+	print net['network']
 ```
