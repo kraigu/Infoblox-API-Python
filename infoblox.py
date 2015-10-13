@@ -763,7 +763,7 @@ class Infoblox(object):
             r_json = r.json()
             if r.status_code == 200:
                 if len(r_json) > 0:
-                    return r_json[0]
+                    return r_json 
                 else:
                     raise InfobloxNotFoundException("No networks found")
             else:
