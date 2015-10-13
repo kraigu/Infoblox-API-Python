@@ -64,6 +64,7 @@ class Infoblox(object):
         get_txt_by_regexp
         get_host_by_extattrs
         get_host_extattrs
+        get_host_by_mac
         get_network
         get_network_by_ip
         get_network_by_extattrs
@@ -744,6 +745,29 @@ class Infoblox(object):
                     raise InfobloxNotFoundException(r_json['text'])
                 else:
                     r.raise_for_status()
+        except ValueError:
+            raise Exception(r)
+        except Exception:
+            raise
+
+    def get_host_by_mac(self, mac, attributes=None):
+        """ IBA REST API call to retreive a host object by MAC address
+        Returns a record:host type list
+        :param mac: MAC address (string)
+        """
+        rest_url = 'https://' + self.iba_host + '/wapi/v' + self.iba_wapi_version + \
+            '/record:host?mac=' + mac + '&view=' + \
+            self.iba_dns_view
+        try:
+            r = requests.get(url=rest_url, auth=(
+                self.iba_user, self.iba_password), verify=self.iba_verify_ssl)
+            r_json = r.json()
+            if r.status_code == 200:
+                if len(r_json) > 0:
+                    return r_json[0]
+            else:
+                raise InfobloxNotFoundException(
+                    "No requested host found: " + mac)
         except ValueError:
             raise Exception(r)
         except Exception:
