@@ -1254,3 +1254,39 @@ class Infoblox(object):
             raise Exception(r)
         except Exception:
             raise
+
+    def csv_upload(self, filename, operation):
+        # create the request url for init.
+        rest_url_pre = 'https://' + self.iba_host + '/wapi/v' + self.iba_wapi_version
+
+        try:
+            init_url = rest_url_pre + '/fileop?_function=uploadinit'
+            # send request to the server to establish the object, with token and url.
+            r = requests.post(url=init_url, auth=(self.iba_user, self.iba_password), verify=self.iba_verify_ssl)
+            r_json = r.json()
+
+            # need to do escaping or we will have issues when it's sent to the requests.post
+            req_url = r_json['url']
+            files = {'file': (filename, open(filename, 'rb')) }
+            file_r = requests.post(url=req_url, auth=(self.iba_user, self.iba_password), verify=self.iba_verify_ssl, files=files)
+
+            # Use the token to tell the server to process the file as a csv_import
+            token = r_json['token'].encode('unicode-escape')
+            csv_url = rest_url_pre + '/fileop?_function=csv_import'
+            # Here we use the on_error CONTINUE setting so that if we try and delete lines that don't exist we keep going,
+            # and so that if we try and insert lines that are already in infoblox it simply keeps going.
+            payload = '{ "token": "' + token + '", "operation": "' + operation + '" }'
+            requests.post(url=csv_url, auth=(self.iba_user, self.iba_password), verify=self.iba_verify_ssl, data=payload)
+
+        except ValueError:
+            raise Exception(r)
+        except Exception:
+            raise
+
+    # Inserts the rows of elements associated with rows in the CSV.
+    def csv_insert(self, filename):
+        self.csv_upload(filename, 'INSERT')
+
+    # Deletes the rows of elements associated with rows in the CSV.
+    def csv_delete(self, filename):
+        self.csv_upload(filename, 'DELETE')
