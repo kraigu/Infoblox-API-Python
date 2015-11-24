@@ -71,6 +71,9 @@ class Infoblox(object):
         get_network_extattrs
         update_network_extattrs
         delete_network_extattrs
+	csv_upload
+	csv_insert
+	csv_delete
     """
 
     def __init__(self, iba_ipaddr, iba_user, iba_password, iba_wapi_version, iba_dns_view, iba_network_view, iba_verify_ssl=False):
