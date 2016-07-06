@@ -13,6 +13,9 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+# Additions/alterations by "Mike Patterson" <mpatters@uwaterloo.ca>
+#  2015-2016
+
 import re
 import requests
 import json
@@ -93,6 +96,11 @@ class Infoblox(object):
         self.iba_dns_view = iba_dns_view
         self.iba_network_view = iba_network_view
         self.iba_verify_ssl = iba_verify_ssl
+
+    def add_view(self,arg):
+        """ Stupid helper function to add &view= to URL requests that want one
+        """
+        return arg + '&view=' + self.iba_dns_view
 
     def get_next_available_ip(self, network):
         """ Implements IBA next_available_ip REST API call
@@ -564,11 +572,14 @@ class Infoblox(object):
         """
         if fields:
             rest_url = 'https://' + self.iba_host + '/wapi/v' + self.iba_wapi_version + \
-                '/record:host?name=' + fqdn + '&view=' + \
-                self.iba_dns_view + '&_return_fields=' + fields
+                '/record:host?name=' + fqdn + '&_return_fields=' + fields
+            if not self.iba_dns_view == '':
+                rest_url = add_view(rest_url)
         else:
             rest_url = 'https://' + self.iba_host + '/wapi/v' + self.iba_wapi_version + \
-                '/record:host?name=' + fqdn + '&view=' + self.iba_dns_view
+                '/record:host?name=' + fqdn
+            if not self.iba_dns_view == '':
+                rest_url = add_view(rest_url)
         try:
             r = requests.get(url=rest_url, auth=(
                 self.iba_user, self.iba_password), verify=self.iba_verify_ssl)
@@ -718,8 +729,9 @@ class Infoblox(object):
         :param attributes: array of extensible attribute names (optional)
         """
         rest_url = 'https://' + self.iba_host + '/wapi/v' + self.iba_wapi_version + \
-            '/record:host?name=' + fqdn + '&view=' + \
-            self.iba_dns_view + '&_return_fields=name,extattrs'
+            '/record:host?name=' + fqdn + '&_return_fields=name,extattrs'
+        if not self.iba_dns_view == '':
+            rest_url = add_view(rest_url)
         try:
             r = requests.get(url=rest_url, auth=(
                 self.iba_user, self.iba_password), verify=self.iba_verify_ssl)
