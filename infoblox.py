@@ -14,7 +14,7 @@
 #   limitations under the License.
 
 # Additions/alterations by "Mike Patterson" <mpatters@uwaterloo.ca>
-#  2015-2016
+#  2015-2017
 
 import re
 import requests
@@ -74,9 +74,11 @@ class Infoblox(object):
         get_network_extattrs
         update_network_extattrs
         delete_network_extattrs
-	csv_upload
-	csv_insert
-	csv_delete
+    	csv_upload
+    	csv_insert
+    	csv_delete
+        get_lease_cltt_by_hostname
+        get_lease_by_ip
     """
 
     def __init__(self, iba_ipaddr, iba_user, iba_password, iba_wapi_version, iba_dns_view, iba_network_view, iba_verify_ssl=False):
@@ -1305,3 +1307,34 @@ class Infoblox(object):
     # Deletes the rows of elements associated with rows in the CSV.
     def csv_delete(self, filename):
         self.csv_upload(filename, 'DELETE')
+
+### DHCP functions.
+### Bug? Getting cltt information only works with dynamic IPs, not static reservations.
+
+    def get_lease_cltt_by_hostname(self,client_hostname):
+        rest_url = 'https://' + self.iba_host + '/wapi/v' + \
+            self.iba_wapi_version + '/lease?_return_fields=cltt&client_hostname~=' + client_hostname
+        try:
+            r = requests.get(url=rest_url, auth=(
+                self.iba_user, self.iba_password), verify=self.iba_verify_ssl)
+            r_json = r.json()
+        except ValueError:
+            raise Exception(r)
+        except Exception:
+            raise
+        if(len(r_json) > 0):
+            return r_json
+
+    def get_lease_by_ip(self,client_ip):
+        rest_url = 'https://' + self.iba_host + '/wapi/v' + \
+            self.iba_wapi_version + '/lease?_return_fields=cltt&address=' + client_ip
+        try:
+            r = requests.get(url=rest_url, auth=(
+                self.iba_user, self.iba_password), verify=self.iba_verify_ssl)
+            r_json = r.json()
+        except ValueError:
+            raise Exception(r)
+        except Exception:
+            raise
+        if(len(r_json) > 0):
+            return r_json
