@@ -79,6 +79,7 @@ class Infoblox(object):
     	csv_delete
         get_lease_cltt_by_hostname
         get_lease_by_ip
+        get_lease_by_mac
     """
 
     def __init__(self, iba_ipaddr, iba_user, iba_password, iba_wapi_version, iba_dns_view, iba_network_view, iba_verify_ssl=False):
@@ -1328,6 +1329,20 @@ class Infoblox(object):
     def get_lease_by_ip(self,client_ip):
         rest_url = 'https://' + self.iba_host + '/wapi/v' + \
             self.iba_wapi_version + '/lease?_return_fields=cltt&address=' + client_ip
+        try:
+            r = requests.get(url=rest_url, auth=(
+                self.iba_user, self.iba_password), verify=self.iba_verify_ssl)
+            r_json = r.json()
+        except ValueError:
+            raise Exception(r)
+        except Exception:
+            raise
+        if(len(r_json) > 0):
+            return r_json
+
+    def get_leaseip_by_mac(self,client_mac):
+        rest_url = 'https://' + self.iba_host + '/wapi/v' + \
+            self.iba_wapi_version + '/search?search_string:=' + client_mac
         try:
             r = requests.get(url=rest_url, auth=(
                 self.iba_user, self.iba_password), verify=self.iba_verify_ssl)

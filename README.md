@@ -37,7 +37,12 @@ Class **Infoblox** implements the following methods:
 - get_network_extattrs
 - update_network_extattrs
 - delete_network_extattrs
-
+- csv_upload
+- csv_insert
+- csv_delete
+- get_lease_cltt_by_hostname
+- get_lease_by_ip
+- get_lease_by_mac
 * * *
 
 ### How to use
