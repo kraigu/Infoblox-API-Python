@@ -1353,3 +1353,30 @@ class Infoblox(object):
             raise
         if(len(r_json) > 0):
             return r_json
+
+    def query_record(self, record_type, fields=None, **kwargs):
+        rest_url = 'https://{}/wapi/v{}/record:{}?'.format(self.iba_host, self.iba_wapi_version, record_type)
+        if fields:
+            kwargs['_return_fields'] = fields
+
+        params = '&'.join(['{}={}'.format(k,v) for k,v in kwargs.iteritems()])
+
+        rest_url += params
+
+        if not self.iba_dns_view == '':
+            rest_url = add_view(rest_url)
+        try:
+            r = requests.get(url=rest_url, auth=(
+                self.iba_user, self.iba_password), verify=self.iba_verify_ssl)
+            r_json = r.json()
+            if r.status_code == 200:
+                return r_json
+            else:
+                if 'text' in r_json:
+                    raise InfobloxNotFoundException(r_json['text'])
+                else:
+                    r.raise_for_status()
+        except ValueError:
+            raise Exception(r)
+        except Exception:
+            raise
