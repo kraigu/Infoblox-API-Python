@@ -13,8 +13,12 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-# Additions/alterations by "Mike Patterson" <mpatters@uwaterloo.ca>
-#  2015-2017
+# Additions/alterations by
+# Mike Patterson <mpatters@uwaterloo.ca>
+# Ryan Goggin
+# Steve Scott
+# all UW-IST-ISS
+# 2015-2018
 
 import re
 import requests
