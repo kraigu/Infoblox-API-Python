@@ -1099,14 +1099,19 @@ class Infoblox(object):
         except Exception:
             raise
 
-    def create_network(self, network):
+    def create_network(self, network, comment=''):
         """ Implements IBA REST API call to create DHCP network object
         :param network: network in CIDR format
         """
         rest_url = 'https://' + self.iba_host + \
             '/wapi/v' + self.iba_wapi_version + '/network'
         payload = '{"network": "' + network + \
-            '","network_view": "' + self.iba_network_view + '"}'
+            '","network_view": "' + self.iba_network_view + '"'
+        if(len(comment) > 0):
+            payload += ',"comment":"'+comment+'"}'
+        else:
+            payload += '}'
+
         try:
             r = requests.post(url=rest_url, auth=(
                 self.iba_user, self.iba_password), verify=self.iba_verify_ssl, data=payload)
