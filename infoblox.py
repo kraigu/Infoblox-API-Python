@@ -1282,7 +1282,7 @@ class Infoblox(object):
         except Exception:
             raise
 
-    def csv_upload(self, filename, operation):
+    def csv_upload(self, filename, operation, update_method="OVERRIDE", on_error):
         # create the request url for init.
         rest_url_pre = 'https://' + self.iba_host + '/wapi/v' + self.iba_wapi_version
 
@@ -1302,8 +1302,10 @@ class Infoblox(object):
             csv_url = rest_url_pre + '/fileop?_function=csv_import'
             # Here we use the on_error CONTINUE setting so that if we try and delete lines that don't exist we keep going,
             # and so that if we try and insert lines that are already in infoblox it simply keeps going.
-            payload = '{ "token": "' + token + '", "operation": "' + operation + '" }'
-            requests.post(url=csv_url, auth=(self.iba_user, self.iba_password), verify=self.iba_verify_ssl, data=payload)
+            payload = { "token": token, "operation": operation, "on_error": 'CONTINUE' }
+            if operation == 'UPDATE':
+                payload['update_method'] = update_method
+            requests.post(url=csv_url, auth=(self.iba_user, self.iba_password), verify=self.iba_verify_ssl, json=payload)
 
         except ValueError:
             raise Exception(r)
