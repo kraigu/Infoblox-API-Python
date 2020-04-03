@@ -1298,7 +1298,7 @@ class Infoblox(object):
             file_r = requests.post(url=req_url, auth=(self.iba_user, self.iba_password), verify=self.iba_verify_ssl, files=files)
 
             # Use the token to tell the server to process the file as a csv_import
-            token = r_json['token'].encode('unicode-escape')
+            token = r_json['token']
             csv_url = rest_url_pre + '/fileop?_function=csv_import'
             # Here we use the on_error CONTINUE setting so that if we try and delete lines that don't exist we keep going,
             # and so that if we try and insert lines that are already in infoblox it simply keeps going.
