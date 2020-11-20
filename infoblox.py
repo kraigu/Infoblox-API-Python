@@ -18,7 +18,7 @@
 # Ryan Goggin
 # Steve Scott
 # all UW-IST-ISS
-# 2015-2018
+# 2015-2020
 
 import re
 import requests
@@ -581,12 +581,12 @@ class Infoblox(object):
             rest_url = 'https://' + self.iba_host + '/wapi/v' + self.iba_wapi_version + \
                 '/record:host?name=' + fqdn + '&_return_fields=' + fields
             if not self.iba_dns_view == '':
-                rest_url = add_view(rest_url)
+                rest_url = self.add_view(rest_url)
         else:
             rest_url = 'https://' + self.iba_host + '/wapi/v' + self.iba_wapi_version + \
                 '/record:host?name=' + fqdn
             if not self.iba_dns_view == '':
-                rest_url = add_view(rest_url)
+                rest_url = self.add_view(rest_url)
         try:
             r = requests.get(url=rest_url, auth=(
                 self.iba_user, self.iba_password), verify=self.iba_verify_ssl)
@@ -738,7 +738,7 @@ class Infoblox(object):
         rest_url = 'https://' + self.iba_host + '/wapi/v' + self.iba_wapi_version + \
             '/record:host?name=' + fqdn + '&_return_fields=name,extattrs'
         if not self.iba_dns_view == '':
-            rest_url = add_view(rest_url)
+            rest_url = self.add_view(rest_url)
         try:
             r = requests.get(url=rest_url, auth=(
                 self.iba_user, self.iba_password), verify=self.iba_verify_ssl)
@@ -1375,7 +1375,7 @@ class Infoblox(object):
         rest_url += params
 
         if not self.iba_dns_view == '':
-            rest_url = add_view(rest_url)
+            rest_url = self.add_view(rest_url)
         try:
             r = requests.get(url=rest_url, auth=(
                 self.iba_user, self.iba_password), verify=self.iba_verify_ssl)
